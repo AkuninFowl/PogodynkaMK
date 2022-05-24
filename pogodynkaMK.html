@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Prognoza pogody</title>
+</head>
+
+<body>
+    <h1 class="naglowek">Prognoza pogody</h1>
+
+    <div class="miasta">
+        <select class="option" id="one" width="200px">
+            <option value="" selected="true" disabled="disabled">Wybierz miasto</option>
+
+        </select>
+    </div>
+
+    <div id="loader" class="loader">
+        <img id="img" src="Zdjecia\loading.svg" />
+    </div>
+
+    <div id="wszystko">
+
+        <div class="pogodaAktualna">
+            <div class="parametry">
+                <h2>Pogoda aktualna</h2>
+                <div>Temperatura: <span class="temp"></span></div>
+                <div>Zachmurzenie: <span class="zachmurzenie"></span></div>
+                <div>Kierunek wiatru: <span class="wiatrKierunek"></span></div>
+                <div>Opis:<span class="opis"></span></div>
+            </div>
+            <div class="obrazek">
+                <div id="ikonaDzisiaj"><img src="Zdjecia\blank.png" alt="Ikona pogody dziś" id="ikonka" width="150"
+                        height="130"></div>
+            </div>
+
+        </div>
+
+        <div class="pogodaJutro">
+            <div class="parametry">
+                <h2>Prognoza na jutro</h2>
+                <div>Temperatura: <span class="temp"></span></div>
+                <div>Zachmurzenie: <span class="zachmurzenie"></span></div>
+                <div>Kierunek wiatru: <span class="wiatrKierunek"></span></div>
+                <div>Opis:<span class="opis"></span></div>
+            </div>
+            <div class="obrazek">
+                <div id="ikonaJutra"><img src="Zdjecia\blank.png" alt="Ikona pogody jutro" id="ikonkaJutro" width="150"
+                        height="130"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <style>
+        #loader {
+            visibility: hidden;
+
+        }
+
+        body {
+            font-family: "Lato", 'Times New Roman', Times, serif;
+            background-color: rgb(255, 255, 255);
+        }
+
+
+        .naglowek {
+            margin: 0px;
+            padding: 60px;
+            text-align: center;
+            background: rgb(102, 103, 171);
+            color: white;
+            font-size: 40px;
+
+        }
+
+        .pogodaAktualna,
+        .pogodaJutro {
+            margin: 10px;
+            border: 1px solid rgb(102, 103, 171);
+            padding: 10px;
+            width: 50%;
+        }
+
+        #wszystko {
+            display: flex;
+            width: 100%;
+            margin: 0px;
+        }
+
+        .obrazek {
+            float: right;
+        }
+
+        .parametry {
+            float: left;
+        }
+
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -50px;
+            margin-left: -50px;
+            width: 100px;
+            height: 100px;
+        }
+
+        #img {
+            width: 150%;
+            height: 150%;
+        }
+
+        .miasta {
+            position: relative;
+            left: 50%;
+            margin-left: -50px;
+            width: 100px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+
+        }
+
+        select {
+            appearance: none;
+            background: rgb(233, 233, 233);
+            text-align: center;
+            height: max-content;
+            color: black;
+            border: 1px solid black;
+            border-radius: 3px;
+            font-weight: bolder;
+            width: max-content;
+            padding: 8px;
+        }
+
+        .miasta {
+            position: relative;
+            display: block;
+            width: 15em;
+            height: 2em;
+            line-height: 3;
+            overflow: hidden;
+            border-radius: .25em;
+            padding-bottom: 10px;
+        }
+    </style>
+
+
+
+    <script>
+        pobierzDaneMiasto();
+        let elementDzisTemp = document.querySelector(".pogodaAktualna .temp");
+        let elementDzisZachmurzenie = document.querySelector(".pogodaAktualna .zachmurzenie");
+        let elementDzisKierunekWiatru = document.querySelector(".pogodaAktualna .wiatrKierunek");
+        let elementDzisOpis = document.querySelector(".pogodaAktualna .opis");
+        let elementDzisIkonka = document.querySelector(".pogodaAktualna #ikonka");
+
+        let select = document.querySelector(".option");
+        let wszystko = document.querySelector("#wszystko");
+
+
+
+        let elementJutroTemp = document.querySelector(".pogodaJutro .temp");
+        let elementJutroZachmurzenie = document.querySelector(".pogodaJutro .zachmurzenie");
+        let elementJutroKierunekWiatru = document.querySelector(".pogodaJutro .wiatrKierunek");
+        let elementJutroOpis = document.querySelector(".pogodaJutro .opis");
+        let elementJutroIkonka = document.querySelector(".pogodaJutro #ikonkaJutro");
+
+        let elementPrzycisk = document.querySelector("#przycisk");
+        let elementPrzyciskDrugi = document.querySelector("#przyciskDrugi");
+        let elementMiasto = document.querySelector(".miasta #miasto1");
+
+        function rozpakujDane(dane) {
+
+            let dzisTemp = dane.teraz.temperatura;
+            let dzisZachmurzenie = dane.teraz.zachmurzenie;
+            let dzisKierunekWiatru = dane.teraz.wiatrKierunek;
+            let dzisOpis = dane.teraz.opis;
+            let dzisIkonka = dane.teraz.ikonka;
+
+            let jutroTemp = dane.prognoza.jutro.temperatura;
+            let jutroZachmurzenie = dane.prognoza.jutro.zachmurzenie;
+            let jutroKierunekWiatru = dane.prognoza.jutro.wiatrKierunek;
+            let jutroOpis = dane.prognoza.jutro.opis;
+            let jutroIkonka = dane.prognoza.jutro.ikonka;
+
+
+            elementDzisTemp.innerHTML = dzisTemp + "°C";
+            elementDzisZachmurzenie.innerHTML = dzisZachmurzenie + "%";
+            elementJutroTemp.innerHTML = jutroTemp + "°C";
+            elementJutroZachmurzenie.innerHTML = jutroZachmurzenie + "%";
+            elementDzisIkonka.innerHTML = dzisIkonka;
+            elementJutroIkonka.innerHTML = jutroIkonka;
+
+            document.getElementById("ikonka").src = "Zdjecia" + "\\" + dzisIkonka + ".png";
+            document.getElementById("ikonkaJutro").src = "Zdjecia" + "\\" + jutroIkonka + ".png";
+
+
+            elementDzisKierunekWiatru.innerHTML = dzisKierunekWiatru + "°";
+            elementDzisOpis.innerHTML = dzisOpis;
+            elementJutroKierunekWiatru.innerHTML = jutroKierunekWiatru + "°";
+            elementJutroOpis.innerHTML = jutroOpis;
+
+
+        }
+
+        function rozpakujDaneMiasto(daneMiasto) {
+
+            for (let i = 0; i < daneMiasto.length; i++) {
+                let option = document.createElement("option");
+                option.value = daneMiasto[i].nazwa;
+                option.text = daneMiasto[i].nazwa;
+                select.appendChild(option);
+
+
+            }
+
+
+        }
+
+        function znikajaceKolo() {
+            document.getElementById("loader").style.visibility = "visible";
+            document.getElementById("wszystko").style.visibility = "hidden";
+
+            setTimeout(function () {
+                document.getElementById("loader").style.visibility = "hidden";
+                document.getElementById("wszystko").style.visibility = "visible";
+
+            }, 1200)
+        }
+
+        function clearElement(element) {
+            element.innerHTML = "";
+        }
+
+
+        function odbierzDane(response) {
+            response.json()
+                .then(rozpakujDane)
+        }
+
+        function pobierzDane() {
+            fetch("https://www.wowapi.pl/pogoda/prognoza?miasto=" + select.value)
+
+                .then(odbierzDane)
+
+        }
+
+        function odbierzDaneMiasto(responseMiasto) {
+            responseMiasto.json()
+                .then(rozpakujDaneMiasto)
+        }
+
+        function pobierzDaneMiasto() {
+            fetch("https://www.wowapi.pl/pogoda/miasta")
+
+                .then(odbierzDaneMiasto)
+
+
+        }
+
+        select.addEventListener("change", pobierzDane);
+        select.addEventListener("change", znikajaceKolo);
+
+
+
+    </script>
+</body>
+
+</html>
